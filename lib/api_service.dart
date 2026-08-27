@@ -65,18 +65,26 @@ class VersionStat {
   final String version;
   final int totalReviews;
   final double avgRating;
+  final int positive;
+  final int negative;
 
   VersionStat({
     required this.version,
     required this.totalReviews,
     required this.avgRating,
+    required this.positive,
+    required this.negative,
   });
+
+  int get neutral => totalReviews - positive - negative;
 
   factory VersionStat.fromJson(Map<String, dynamic> json) {
     return VersionStat(
       version: json['software_version']?.toString() ?? '',
       totalReviews: (json['total_reviews'] as num?)?.toInt() ?? 0,
       avgRating: (json['avg_rating'] as num?)?.toDouble() ?? 0.0,
+      positive: (json['positive'] as num?)?.toInt() ?? 0,
+      negative: (json['negative'] as num?)?.toInt() ?? 0,
     );
   }
 }
