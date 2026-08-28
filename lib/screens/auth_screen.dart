@@ -103,7 +103,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Feedback',
+                      'Anonymous Feedback',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineMedium,
                     ),
@@ -128,6 +128,10 @@ class _AuthScreenState extends State<AuthScreen> {
                         labelText: 'Email',
                         prefixIcon: Icon(Icons.mail_outline),
                         border: OutlineInputBorder(),
+                        // Promisiunea de anonimat, chiar sub campul unde
+                        // utilizatorul ezita cel mai mult sa scrie.
+                        helperText: '(anonymous) — never shown to other users',
+                        helperMaxLines: 2,
                       ),
                       validator: _validateEmail,
                     ),
