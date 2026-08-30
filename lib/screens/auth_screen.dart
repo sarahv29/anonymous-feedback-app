@@ -96,10 +96,19 @@ class _AuthScreenState extends State<AuthScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(
-                      Icons.rate_review_outlined,
-                      size: 56,
-                      color: theme.colorScheme.primary,
+                    // Logo-ul real al aplicatiei, nu o iconita generica.
+                    // Colturile se rotunjesc aici, ca sa nu se vada
+                    // patratul negru din jurul chenarului verde.
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Image.asset(
+                          'assets/icon.png',
+                          width: 104,
+                          height: 104,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
