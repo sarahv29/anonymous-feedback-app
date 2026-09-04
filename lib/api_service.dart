@@ -15,6 +15,7 @@ class ApiException implements Exception {
 
 /// Un feedback afisat in lista publica.
 class FeedbackItem {
+  final int id;
   final String username;
   final String version;
   final int rating;
@@ -26,6 +27,7 @@ class FeedbackItem {
   final String sentiment;
 
   FeedbackItem({
+    required this.id,
     required this.username,
     required this.version,
     required this.rating,
@@ -47,6 +49,7 @@ class FeedbackItem {
 
   factory FeedbackItem.fromJson(Map<String, dynamic> json) {
     return FeedbackItem(
+      id: (json['id'] as num?)?.toInt() ?? 0,
       username: json['username']?.toString() ?? 'anonymous',
       version: json['software_version']?.toString() ?? '',
       rating: (json['rating'] as num?)?.toInt() ?? 0,
@@ -299,6 +302,22 @@ class ApiService {
       return data
           .map((e) => FeedbackItem.fromJson(e as Map<String, dynamic>))
           .toList();
+    });
+  }
+
+  /// Raporteaza o recenzie nepotrivita.
+  /// Serverul o ascunde automat dupa un numar de raportari.
+  static Future<void> reportFeedback(int feedbackId, String reason) {
+    return _guard(() async {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/feedback/$feedbackId/report'),
+            headers: _headers,
+            body: jsonEncode({'reason': reason}),
+          )
+          .timeout(_timeout);
+
+      _decode(response);
     });
   }
 

@@ -65,6 +65,62 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     _load();
   }
 
+  /// Deschide dialogul de raportare si trimite motivul ales.
+  Future<void> _report(FeedbackItem item) async {
+    const motive = [
+      'Spam or advertising',
+      'Offensive or hateful',
+      'Contains personal information',
+      'Not relevant to the version',
+      'Something else',
+    ];
+
+    final ales = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: const Text('Report this review'),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+            child: Text(
+              'Tell us what is wrong with it. Reviews reported by several '
+              'people are hidden automatically and checked.',
+              style: Theme.of(dialogContext).textTheme.bodySmall,
+            ),
+          ),
+          for (final motiv in motive)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(dialogContext).pop(motiv),
+              child: Text(motiv),
+            ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Theme.of(dialogContext).colorScheme.onSurfaceVariant),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (ales == null) return;
+
+    try {
+      await ApiService.reportFeedback(item.id, ales);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Thank you. This review has been reported.')),
+      );
+      await _load();
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    }
+  }
+
   // ==================== BUCATI DE INTERFATA ====================
 
   Widget _filterRow(ThemeData theme) {
@@ -210,6 +266,17 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
+                ),
+                // Raportarea continutului nepotrivit. Google o cere obligatoriu
+                // pentru orice aplicatie in care utilizatorii publica text.
+                IconButton(
+                  icon: const Icon(Icons.flag_outlined, size: 18),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: 'Report this review',
+                  color: theme.colorScheme.onSurfaceVariant,
+                  onPressed: () => _report(item),
                 ),
               ],
             ),
